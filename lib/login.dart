@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:login/welcome.dart';
 import 'helper.dart';
+import 'auth_helper.dart';
+import 'home_pg.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -9,6 +11,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  static const String id = 'login_screen';
+
+  TextEditingController _emailController ;
+  TextEditingController _passwordController ;
+  @override
+  void initState(){
+    super.initState();
+    _emailController = TextEditingController(text : "");
+    _passwordController = TextEditingController(text : "");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
                 TextField(
+                  controller: _emailController,
                   textAlign: TextAlign.center,
                   onChanged: (value){
 
@@ -72,6 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 20,
                 ),
                 TextField(
+                  controller: _passwordController,
                   obscureText: true,
                   textAlign: TextAlign.center,
                   onChanged: (value){
@@ -100,16 +116,36 @@ class _LoginScreenState extends State<LoginScreen> {
                 RoundedButton(
                   title: "login",
                   colour: Colors.red,
-                  onPressed: (){
-
+                  onPressed: ()async{
+                    if(_emailController.text.isEmpty|| _passwordController.text.isEmpty){
+                      print("Email and Password is empty");
+                      return;
+                    }
+                    try{
+                      final user = await AuthHelper.signInWithEmail(
+                        email: _emailController.text,
+                        password: _passwordController.text);
+                          if(user != null){
+                            print('Login Success');
+                      }
+                    } catch(e){
+                      print(e);
+                    }
                   },
                 ),
                 RoundedButton(
-                  title: "Back",
-                  //colour: Color(0xFF303B90),
+                  title: "login with Google",
                   colour: Colors.red,
-                  onPressed: (){
-                    Navigator.popAndPushNamed(context, WelcomeScreen.id);
+                  onPressed: () async {
+                    try{
+                      await AuthHelper.signInWithGoogle();
+                      }
+                     catch(e){
+                      print(e);
+                    }
+
+
+
                   },
                 ),
                 SizedBox(height: 250.0,),
